@@ -17,15 +17,15 @@ class Encoder(nn.Module):
         self.fc22 = nn.Linear(512, 128)
 
     def forward(self, x):
-        x = nn.functional.relu(self.conv1(x))
-        x = nn.functional.relu(self.conv2(x))
-        x = nn.functional.relu(self.conv3(x))
-        x = nn.functional.relu(self.conv4(x))
-        x = x.view(-1, 256 * 8 * 8)
-        x = nn.functional.relu(self.fc1(x))
-        mu = self.fc21(x)
-        logvar = self.fc22(x)
-        return mu, logvar
+        x1 = nn.functional.relu(self.conv1(x))
+        x2 = nn.functional.relu(self.conv2(x1))
+        x3 = nn.functional.relu(self.conv3(x2))
+        x4 = nn.functional.relu(self.conv4(x3))
+        x5 = x4.view(-1, 256 * 8 * 8)
+        x6 = nn.functional.relu(self.fc1(x5))
+        mu = self.fc21(x6)
+        logvar = self.fc22(x6)
+        return mu, logvar,(x1,x2,x3)
 
 # Define the decoder neural network
 class Decoder(nn.Module):
@@ -38,16 +38,17 @@ class Decoder(nn.Module):
         self.conv3 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1)
         self.conv4 = nn.ConvTranspose2d(32, 3, kernel_size=4, stride=2, padding=1)
 
-    def forward(self, z):
+    def forward(self, z, encoder_outputs):
         z = nn.functional.relu(self.fc1(z))
         z = nn.functional.relu(self.fc2(z))
         z = z.view(-1, 256, 8, 8)
-        z = nn.functional.relu(self.conv1(z))
-        z = nn.functional.relu(self.conv2(z))
-        z = nn.functional.relu(self.conv3(z))
+        z = nn.functional.relu(self.conv1(z) + encoder_outputs[2])  # skip connection
+        z = nn.functional.relu(self.conv2(z) + encoder_outputs[1])  # skip connection
+        z = nn.functional.relu(self.conv3(z) + encoder_outputs[0])  # skip connection
         z = self.conv4(z)
         z = torch.sigmoid(z)
         return z
+
 
 # Define the VAE model
 class VAE(nn.Module):
@@ -62,16 +63,17 @@ class VAE(nn.Module):
         return mu + eps * std
 
     def forward(self, x):
-        mu, logvar = self.encoder(x)
+        mu, logvar, encoder_outputs = self.encoder(x)
         z = self.reparameterize(mu, logvar)
-        recon_x = self.decoder(z)
+        recon_x = self.decoder(z, encoder_outputs)
         return recon_x, mu, logvar
 
 # Define the loss function
-def loss_function(recon_x, x, mu, logvar):
+def loss_function(recon_x, x, mu, logvar, beta=1.0):
     BCE = nn.functional.binary_cross_entropy(recon_x, x, reduction='sum')
+    # see the Beta-VAE paper for the derivation of this KL divergence term
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    return BCE + KLD
+    return BCE + beta * KLD
 
 # Define the optimizer
 vae = VAE().to(device)
