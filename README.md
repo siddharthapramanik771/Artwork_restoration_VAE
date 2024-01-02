@@ -67,20 +67,7 @@ Training is performed in two stages:
 
 ## Evaluation
 
-The model's performance is evaluated on a test dataset. For each test sample, the input image, reconstructed image, and clear image are displayed. Additionally, several image similarity metrics are computed, including Structural Similarity Index (SSI), Mean Squared Error (MSE), and Histogram Correlation.
-
-## Usage
-
-To train the model, run the provided script with the appropriate dataset paths. After training, the model can be loaded for evaluation or further usage.
-
-```python
-# Example usage
-from vae_model import VAE, load_model
-
-# Load the pre-trained model
-vae = VAE()
-load_model()
-```
+The model's performance is evaluated on a test dataset. For each test sample, the input image, reconstructed image, and clear image are displayed. Additionally, several image similarity metrics are computed, including Structural Similarity Index (SSI), Mean Squared Error (MSE), and Histogram Correlation .
 
 ## Author
 Siddhartha Pramanik
