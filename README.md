@@ -3,7 +3,7 @@
 ## Overview
 
 This repository contains a Variational Autoencoder (VAE)-based image restoration model implemented in PyTorch. The model incorporates skip connections in the decoder to enhance information flow during the upsampling process.
-for detailed explanation , see in [medium](https://www.youtube.com/)
+for detailed explanation , see in [medium](https://medium.com/@siddharthapramanik771/image-restoration-using-deep-learning-variational-autoencoders-8483135bb72d).
 The used dataset is a smaller version of this dataset from [kaggle](https://www.kaggle.com/datasets/sankarmechengg/art-images-clear-and-distorted)
 
 ## Model Architecture
