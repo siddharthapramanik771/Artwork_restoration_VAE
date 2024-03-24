@@ -4,7 +4,7 @@ import torch.optim as optim
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Define the encoder neural network
+# Define the encoder neural network spr
 class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
